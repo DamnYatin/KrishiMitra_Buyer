@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KrishiMitra - Buyer Marketplace (SIH26132)</title>
+  <meta name="description" content="Direct procurement marketplace connecting bulk buyers with verified farmers with zero middleman fees.">
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .buyer-deal-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .buyer-deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      border-color: var(--primary);
+    }
+    .buyer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 0.85rem;
+      margin-top: 0.85rem;
+    }
+    .filter-bar {
+      background: #ffffff;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-color);
+      display: grid;
+      grid-template-columns: 1.5fr 1.5fr 1.2fr auto;
+      gap: 0.65rem;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+    @media (max-width: 768px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+      .filter-bar button {
+        width: 100% !important;
+      }
+      .buyer-grid {
+        grid-template-columns: 1fr;
+      }
+      #inquiryModal {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      #inquiryModal .card {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+        max-width: 100% !important;
+        margin-bottom: 0 !important;
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-icon">🛒</span>
+        <div>
+          <h1 class="brand-title">KrishiMitra Buyer Market</h1>
+          <p class="brand-subtitle">Direct Farm Procurement & Transparent Deals</p>
+        </div>
+      </a>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <a href="/" class="btn btn-outline" style="min-height: 34px; padding: 0.25rem 0.75rem; font-size: 0.82rem; background: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.4); width: auto;">
+          🌾 Farmer View
+        </a>
+        <a href="/admin" class="btn btn-outline" style="min-height: 34px; padding: 0.25rem 0.75rem; font-size: 0.82rem; background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.3); width: auto;">
+          ⚙️ Admin
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" style="max-width: 1080px;">
+
+    <!-- Info Banner -->
+    <div class="card" style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: #ffffff; margin-bottom: 1rem; border: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; color: #fef08a;">
+            🤝 Direct Farmer–Buyer Linkage
+          </h2>
+          <p style="font-size: 0.88rem; color: #e2e8f0; margin: 0; max-width: 650px;">
+            Buy agricultural commodities directly from local farmers at fair negotiated prices with zero APMC middleman commissions. Click <strong>"I'm Interested"</strong> to register interest and connect instantly.
+          </p>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 0.78rem; background: rgba(255,255,255,0.2); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-weight: 700;">
+            🛡️ Privacy Protected Feed
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <section class="filter-bar">
+      <div>
+        <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">FILTER BY CROP</label>
+        <select id="buyerCropFilter" class="form-select" style="min-height: 42px; font-size: 0.9rem;">
+          <option value="">All Commodities (सर्व पिके)</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">LOCATION / REGION</label>
+        <input type="text" id="buyerLocationFilter" class="form-input" placeholder="e.g. Nashik, Amravati, Nagpur" style="min-height: 42px; font-size: 0.9rem;">
+      </div>
+
+      <div>
+        <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">SORT BY</label>
+        <select id="buyerSortFilter" class="form-select" style="min-height: 42px; font-size: 0.9rem;">
+          <option value="newest">🕒 Newest Listings First</option>
+          <option value="price_high">💰 Price: High to Low</option>
+          <option value="price_low">🏷️ Price: Low to High</option>
+        </select>
+      </div>
+
+      <div style="align-self: flex-end;">
+        <button id="buyerRefreshBtn" class="btn btn-outline" style="min-height: 42px; width: auto; font-size: 0.88rem;">
+          ⚡ Refresh
+        </button>
+      </div>
+    </section>
+
+    <!-- Active Deals Feed Summary Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding: 0 0.25rem;">
+      <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">
+        🌾 Available Harvest Deals (<span id="dealCountDisplay">0</span>)
+      </div>
+      <div style="font-size: 0.82rem; color: var(--text-muted);" id="autoRefreshStatus">
+        🔄 Auto-refreshing in 15s
+      </div>
+    </div>
+
+    <!-- Deals Grid Container -->
+    <div id="buyerFeedContainer" class="buyer-grid">
+      <!-- Dynamically filled by buyer.js -->
+    </div>
+
+  </main>
+
+  <!-- Inquiry Modal Dialog -->
+  <div id="inquiryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; padding: 1rem;">
+    <div class="card" style="max-width: 420px; width: 100%; animation: slideUp 0.25s ease;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); margin: 0;">
+          🤝 Connect with Farmer
+        </h3>
+        <button type="button" id="closeModalBtn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <div id="modalDealSummary" style="background: var(--bg-page); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.88rem;">
+        <!-- Filled dynamically -->
+      </div>
+
+      <form id="inquiryForm">
+        <input type="hidden" id="inquiryDealId">
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.85rem;">🏢 Your Business / Trader Name</label>
+          <input type="text" id="buyerNameInput" class="form-input" placeholder="e.g. Maharashtra Agro Traders" required value="Maharashtra Agro Traders">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 0.85rem;">📞 Your Phone Number</label>
+          <input type="tel" id="buyerPhoneInput" class="form-input" placeholder="10-digit mobile number" required value="9890112233" pattern="[0-9]{10}">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="confirmInquiryBtn" style="font-size: 0.95rem; margin-top: 0.5rem;">
+          🔓 Unlock Farmer Contact
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/buyer/js/buyer.js"></script>
+</body>
+</html>

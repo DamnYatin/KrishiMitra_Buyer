@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KrishiMitra - Mandi Compare Dashboard (SIH26132)</title>
+  <meta name="description" content="Ranked mandi price comparison factoring transport and handling fees. Smart India Hackathon 2026.">
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- App Header with Brand and Language Pills -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="brand-wrapper">
+        <span class="brand-icon">🌾</span>
+        <div>
+          <h1 class="brand-title" data-i18n="appTitle">KrishiMitra</h1>
+          <p class="brand-subtitle" data-i18n="appSubtitle">Mandi Price & Transport Estimator</p>
+        </div>
+      </a>
+
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <a href="/buyer" class="btn btn-outline" style="min-height: 32px; padding: 2px 10px; font-size: 0.8rem; background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.4); width: auto;">
+          🛒 Buyer Market
+        </a>
+
+        <!-- Multilingual Language Selector -->
+        <div class="lang-selector" role="group" aria-label="Language Selector">
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="hi">हिन्दी</button>
+          <button class="lang-btn" data-lang="mr">मराठी</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="main-content">
+
+    <!-- Loading Spinner Indicator -->
+    <div id="loadingIndicator" style="text-align: center; padding: 3rem 1rem;">
+      <div style="font-size: 3rem; animation: pulseBar 1s infinite alternate;">⏳</div>
+      <h2 style="margin-top: 1rem; color: var(--primary-dark);">Calculating Best Market Net Returns...</h2>
+      <p style="color: var(--text-muted);">Evaluating transport distances, fuel rates, and market handling costs</p>
+    </div>
+
+    <!-- Dashboard Content Container -->
+    <div id="dashboardContent" style="display: none;">
+
+      <!-- 1. Selection Echo Header Card -->
+      <section class="selection-header-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <h2 style="font-size: 1.15rem; font-weight: 800;" data-i18n="dashboardHeader">Mandi Comparison & Return Discovery</h2>
+          <a href="/" class="btn btn-outline" style="min-height: 36px; padding: 0.3rem 0.85rem; font-size: 0.85rem; background: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.4);" data-i18n="changeSelectionBtn">
+            ✏️ Change Selection
+          </a>
+        </div>
+        <div class="selection-badges">
+          <span class="info-chip">🌱 <strong id="cropSelectedName">Cotton</strong></span>
+          <span class="info-chip">📍 <strong id="homeMandiSelectedName">Nagpur</strong></span>
+          <span class="info-chip">⚖️ <strong id="quantitySelectedValue">10 Quintals</strong></span>
+        </div>
+      </section>
+
+      <!-- 2. Screen 2 Champion Winner Recommendation Card -->
+      <section class="winner-card" aria-label="Winner Recommendation Card">
+        <span class="winner-badge" data-i18n="bestChoiceBadge">🏆 Recommended Market (Highest Net Return)</span>
+        
+        <h2 class="winner-name" id="winnerMandiName">Amravati (अमरावती)</h2>
+        
+        <div class="winner-net-price" id="winnerNetPrice">
+          ₹7,134 <span data-i18n="perQtlSuffix">/ quintal</span>
+        </div>
+
+        <div id="winnerProfitCallout" class="winner-benefit-callout" style="display:none;"></div>
+
+        <!-- Effective Price Summary Card (Pitch Deck Breakdown Box) -->
+        <div class="summary-table-box">
+          <div class="summary-row">
+            <span data-i18n="mandiPriceLabel">Mandi Listing Price</span>
+            <strong id="summaryListingPrice">₹7,250 / qtl</strong>
+          </div>
+          <div class="summary-row">
+            <span data-i18n="transportCostLabel">Transport Cost (Distance x Rate)</span>
+            <strong style="color:#b91c1c;" id="summaryTransportCost">-₹116 / qtl</strong>
+          </div>
+          <div class="summary-row">
+            <span data-i18n="otherCostsLabel">Handling & Market Charges</span>
+            <strong style="color:#b91c1c;" id="summaryOtherCosts">-₹0 / qtl</strong>
+          </div>
+          <div class="summary-row highlight">
+            <span data-i18n="effectiveNetReturnLabel">Net Farmer Price</span>
+            <span class="price-val" id="summaryNetPrice">₹7,134 / qtl</span>
+          </div>
+          <div style="font-size: 0.85rem; text-align: right; color: var(--text-muted); margin-top: 0.35rem;">
+            <span data-i18n="recommendedMandiLabel">Recommended Mandi</span>: <strong id="summaryMandiName" style="color:var(--text-main);">Amravati</strong>
+          </div>
+        </div>
+
+        <!-- Voice Synthesis Playing Wave Indicator -->
+        <div id="voicePlayingIndicator" class="voice-playing-pill" style="display: none;">
+          <span class="sound-wave-bars">
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+          </span>
+          <span data-i18n="speakPlaying">🔊 Speaking...</span>
+        </div>
+
+        <!-- Primary Action Buttons: Speak & Navigate -->
+        <div class="action-grid">
+          <button type="button" class="btn btn-gold" id="speakBtn">
+            <span data-i18n="speakBtn">🔊 Speak Result</span>
+          </button>
+          
+          <a href="#" class="btn btn-primary" id="navigateBtn" target="_blank">
+            <span data-i18n="navigateBtn">🗺️ Navigate to Mandi</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 3. Ranked Mandi Comparison List -->
+      <section class="card">
+        <div class="rank-list-title">
+          <span data-i18n="allMandisRankTitle">📊 All Nearby Mandis (Ranked by Profit)</span>
+          <button id="refreshPricesBtn" class="btn btn-outline" style="min-height:34px; padding:2px 8px; font-size:0.8rem; width:auto;" data-i18n="refreshPricesBtn">
+            ⚡ Refresh Live Rates
+          </button>
+        </div>
+
+        <div id="rankedMandisContainer">
+          <!-- Dynamically populated by dashboard.js -->
+        </div>
+      </section>
+
+      <!-- 4. Interactive Google Maps Mandi & Route Visualizer -->
+      <section class="card" id="mapSection">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem;">
+          🗺️ Live Mandi Locations & Route Map
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Powered by Google Maps JavaScript API. Visualizing your Home Mandi (🏠) and recommended market (🏆).
+        </p>
+        <div id="googleMapContainer" style="width: 100%; height: 280px; border-radius: var(--radius-md); border: 1.5px solid var(--border-color); background: #e2e8f0; position: relative;"></div>
+      </section>
+
+      <!-- 5. 7-Day Market Trend & Analytics Card -->
+      <section class="card" id="analyticsCard" style="display: none;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.75rem;" data-i18n="analyticsTitle">
+          📈 7-Day Price Movement & Market Insights
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: var(--bg-page); padding: 1rem; border-radius: var(--radius-md);">
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-light);" data-i18n="avgPrice">7-Day Regional Avg</div>
+            <div id="analyticsAvgPrice" style="font-size: 1.25rem; font-weight: 800; color: var(--primary-dark);">--</div>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; color: var(--text-light);" data-i18n="marketSpread">Regional Price Spread</div>
+            <div id="analyticsSpread" style="font-size: 1.25rem; font-weight: 800; color: var(--accent-gold);">--</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Direct Marketplace: List Your Deal -->
+      <section class="card" id="listDealSection" style="border: 2px solid rgba(22, 101, 52, 0.25); background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); margin: 0;">
+            📢 List Your Deal — Sell Directly to Buyers
+          </h3>
+          <span style="font-size: 0.78rem; font-weight: 700; background: var(--primary-bg); color: var(--primary-dark); padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
+            🛡️ Spam-Protected
+          </span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Prefer selling directly to verified traders without mandi intermediaries? List your harvest here. Your phone number stays hidden until genuine buyers express interest.
+        </p>
+
+        <form id="postDealForm" class="form-grid-2">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">👤 Your Name</label>
+            <input type="text" id="dealFarmerName" class="form-input" placeholder="e.g. Ramesh Patil" required value="Ramesh Patil">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">📞 Phone Number</label>
+            <input type="tel" id="dealFarmerPhone" class="form-input" placeholder="10-digit number" required value="9823012345" pattern="[0-9]{10}">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">🌱 Crop</label>
+            <input type="text" id="dealCropName" class="form-input" readonly style="background: #f1f5f9; font-weight: 600;">
+            <input type="hidden" id="dealCropId">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">⚖️ Quantity (Quintals)</label>
+            <input type="number" id="dealQuantity" class="form-input" step="0.1" min="0.5" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">💰 Asking Price (₹ / quintal)</label>
+            <input type="number" id="dealAskingPrice" class="form-input" step="1" required style="font-weight: 700; color: var(--primary-dark);">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="font-size: 0.85rem;">📍 Your Location</label>
+            <input type="text" id="dealLocation" class="form-input" placeholder="e.g. Nagpur / Amravati" required>
+            <input type="hidden" id="dealMandiId">
+          </div>
+
+          <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <button type="submit" class="btn btn-primary" id="postDealSubmitBtn" style="font-size: 0.95rem;">
+              🚀 Post Deal to Buyer Marketplace
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- 7. Farmer's Active Listings & Inquiries -->
+      <section class="card" id="farmerDealsSection">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            📋 My Active Deal Listings
+          </h3>
+          <a href="/buyer" class="btn btn-outline" style="min-height: 32px; padding: 2px 10px; font-size: 0.82rem; width: auto;">
+            🛒 Open Buyer Market
+          </a>
+        </div>
+        <div id="farmerDealsContainer">
+          <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 1rem;">Loading your active deals...</p>
+        </div>
+      </section>
+
+      <!-- Bottom Navigation Footer -->
+      <div style="text-align: center; margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/" class="btn btn-secondary" style="width: auto; padding: 0.6rem 1.25rem; display: inline-flex;">
+          ⬅️ Check Another Crop
+        </a>
+        <a href="/buyer" class="btn btn-primary" style="width: auto; padding: 0.6rem 1.25rem; display: inline-flex; background: #0f766e;">
+          🛒 View Buyer Marketplace
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Google Maps JavaScript API SDK -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOkEUdOO0Lnb_7HpOZ41mBxc1RSO4QDeU&callback=initGoogleMap" async defer></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

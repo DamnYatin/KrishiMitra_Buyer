@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: krishimitra
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --chdir backend app:app
+    envVars:
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: GOOGLE_MAPS_API_KEY
+        value: AIzaSyDOkEUdOO0Lnb_7HpOZ41mBxc1RSO4QDeU
+      - key: AGMARKNET_API_KEY
+        value: 579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b
